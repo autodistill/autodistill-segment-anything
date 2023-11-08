@@ -10,6 +10,9 @@ with open("./autodistill_segment_anything/__init__.py", 'r') as f:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r") as fh:
+    install_requires = fh.read().split('\n')
+
 setuptools.setup(
     name="autodistill-segment-anything",
     version=version,
@@ -18,10 +21,8 @@ setuptools.setup(
     description="Segment Anything model for use with Autodistill",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="",
-    install_requires=[
-        "supervision"
-    ],
+    url="https://github.com/autodistill/autodistill-segment-anything",
+    install_requires=install_requires,
     packages=find_packages(exclude=("tests",)),
     extras_require={
         "dev": ["flake8", "black==22.3.0", "isort", "twine", "pytest", "wheel"],
