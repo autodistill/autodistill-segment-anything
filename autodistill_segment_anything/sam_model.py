@@ -1,11 +1,13 @@
 import os
 import urllib.request
+from typing import Any
 
 import numpy as np
+import supervision as sv
 import torch
 from segment_anything import SamAutomaticMaskGenerator, sam_model_registry
 
-import supervision as sv
+from autodistill.helpers import load_image
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -15,23 +17,21 @@ from dataclasses import dataclass
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":16:8"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-import torch
 import cv2
+import torch
 
 torch.use_deterministic_algorithms(False)
 
+import numpy as np
 import supervision as sv
+from autodistill_grounded_sam.helpers import load_SAM
 from segment_anything import SamPredictor
 
-import numpy as np
 from autodistill.detection import CaptionOntology, DetectionBaseModel
-
-from autodistill_grounded_sam.helpers import (
-    load_SAM
-)
 
 HOME = os.path.expanduser("~")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 @dataclass
 class SegmentAnything(DetectionBaseModel):
@@ -40,20 +40,24 @@ class SegmentAnything(DetectionBaseModel):
     box_threshold: float
     text_threshold: float
 
-    def __init__(self, ontology: CaptionOntology, box_threshold=0.35, text_threshold=0.25):
+    def __init__(
+        self, ontology: CaptionOntology, box_threshold=0.35, text_threshold=0.25
+    ):
         self.ontology = ontology
         self.predictor = load_SAM()
         self.box_threshold = box_threshold
         self.text_threshold = text_threshold
 
-    def predict(self, input: str) -> sv.Detections:
-        masks = self.predictor.generate(cv2.imread(input))
+    def predict(self, input: Any) -> sv.Detections:
+        masks = self.predictor.generate(load_image(input, return_format="cv2"))
 
         results = sv.Detections.from_sam(masks)
 
-        results.class_id = np.array([0] * len(results.mask[0]))
+        results.class_id = [i for i in range(0, len(results.mask))]
+        results.confidence = np.ones(len(results.mask[0]), dtype=np.float32)
 
         return results
+
 
 def load_SAM():
     # Check if segment-anything library is already installed

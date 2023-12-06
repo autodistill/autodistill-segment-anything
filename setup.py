@@ -1,17 +1,18 @@
-import setuptools
-from setuptools import find_packages
 import re
 
-with open("./autodistill_segment_anything/__init__.py", 'r') as f:
+import setuptools
+from setuptools import find_packages
+
+with open("./autodistill_segment_anything/__init__.py", "r") as f:
     content = f.read()
     # from https://www.py4u.net/discuss/139845
     version = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', content).group(1)
-    
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r") as fh:
-    install_requires = fh.read().split('\n')
+    install_requires = fh.read().split("\n")
 
 setuptools.setup(
     name="autodistill-segment-anything",

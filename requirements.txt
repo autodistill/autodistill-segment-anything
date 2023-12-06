@@ -5,3 +5,4 @@ opencv-python>=4.6.0
 rf_groundingdino
 rf_segment_anything
 supervision
+autodistill_grounded_sam
